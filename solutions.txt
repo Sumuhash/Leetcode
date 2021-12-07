@@ -1,0 +1,1647 @@
+
+Merge Intervals
+Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
+
+Example 1:
+Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+Output: [[1,6],[8,10],[15,18]]
+Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
+
+Example 2:
+Input: intervals = [[1,4],[4,5]]
+Output: [[1,5]]
+Explanation: Intervals [1,4] and [4,5] are considered overlapping.
+
+class Solution:
+    #Time Complexity: O(nlogn) since we are sorting
+    #Space: O(n) for the interval at the end for result
+
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals_sort = sorted(intervals, key=lambda a : a[0]) #sort using start time
+        start = intervals_sort[0][0]
+        end = intervals_sort[0][1]
+        result = []
+        for index in range(1, len(intervals_sort)):
+            #check if new start is between existing interval and new end is bigger than old end
+            if intervals_sort[index][1] > end and intervals_sort[index][0] <= end and intervals_sort[index][0] >= start: 
+                end = intervals_sort[index][1]
+            #check when they dont intercept
+            elif intervals_sort[index][0] > end:
+                temp = [start, end]
+                #set the new start and end
+                start = intervals_sort[index][0]
+                end = intervals_sort[index][1]
+                result.append(temp)
+        #take care of last iteration, since it wont add the last interval
+        result.append([start, end])
+        return result
+
+String to Integer (atoi)
+https://leetcode.com/problems/string-to-integer-atoi/
+Implement the myAtoi(string s) function, which converts a string to a 32-bit signed integer (similar to C/C++'s atoi function).
+The algorithm for myAtoi(string s) is as follows:
+Read in and ignore any leading whitespace.
+Check if the next character (if not already at the end of the string) is '-' or '+'. Read this character in if it is either. This determines if the final result is negative or positive respectively. Assume the result is positive if neither is present.
+Read in next the characters until the next non-digit character or the end of the input is reached. The rest of the string is ignored.
+Convert these digits into an integer (i.e. "123" -> 123, "0032" -> 32). If no digits were read, then the integer is 0. Change the sign as necessary (from step 2).
+If the integer is out of the 32-bit signed integer range [-231, 231 - 1], then clamp the integer so that it remains in the range. Specifically, integers less than -231 should be clamped to -231, and integers greater than 231 - 1 should be clamped to 231 - 1.
+Return the integer as the final result.
+Note:
+Only the space character ' ' is considered a whitespace character.
+Do not ignore any characters other than the leading whitespace or the rest of the string after the digits.
+Example 1:
+Input: s = "42"
+Output: 42
+Explanation: The underlined characters are what is read in, the caret is the current reader position.
+Step 1: "42" (no characters read because there is no leading whitespace)
+         ^
+Step 2: "42" (no characters read because there is neither a '-' nor '+')
+         ^
+Step 3: "42" ("42" is read in)
+           ^
+The parsed integer is 42.
+Since 42 is in the range [-231, 231 - 1], the final result is 42.
+
+class Solution:
+    def myAtoi(self, s: str) -> int:
+        result = ""
+        start = 0
+        #Find end of white space
+        for i in range(len(s)):
+            if s[i] != " ":
+                start = i
+                break
+        for i in range(start, len(s)):
+            #check if sign is there
+            if i == start and s[i] in {"+", "-"}:
+                result += s[i]
+            #check if number
+            elif s[i].isnumeric():
+                result += s[i]
+            #either letter or any random symbol
+            else:
+                break
+        #if no number been found, return 0
+        if result == "" or result in {"+", "-"}:
+            return 0
+        result = int(result)
+        #check integer limits
+        if result > 2**31 - 1:
+            return 2**31 -1
+        elif result < (-2)**31:
+            return (-2)**31
+        else:
+            return result
+
+Minimum Remove to Make Valid Parentheses
+Given a string s of '(' , ')' and lowercase English characters.
+Your task is to remove the minimum number of parentheses ( '(' or ')', in any positions ) so that the resulting parentheses string is valid and return any valid string.
+Formally, a parentheses string is valid if and only if:
+It is the empty string, contains only lowercase characters, or
+It can be written as AB (A concatenated with B), where A and B are valid strings, or
+It can be written as (A), where A is a valid string.
+ 
+Example 1:
+Input: s = "lee(t(c)o)de)"
+Output: "lee(t(c)o)de"
+Explanation: "lee(t(co)de)" , "lee(t(c)ode)" would also be accepted.
+
+Time Complexity: O(n) since we go over each character once.
+Space Complexity: O(n) for the list and the stack
+class Solution:
+    def minRemoveToMakeValid(self, s: str) -> str:
+        listed = list(s)
+        stack = []
+        for i in range(len(listed)):
+            if listed[i] == '(':
+                stack.append(i)
+            elif listed[i] == ')':
+                if len(stack) != 0:
+                    stack.pop()
+                else:
+                    #since the stack is empty, this parenthesis is extra
+                    listed[i] = ''
+        # if the stack is still not empty, means that there are still extra open '(' parentheses. 
+        while len(stack) != 0:
+            listed[stack.pop()] = ''
+        
+        #simply join the elements of the list with no separator
+        return ''.join(listed)
+
+Valid Palindrome II
+Given a string s, return true if the s can be palindrome after deleting at most one character from it.
+
+class Solution:
+    def validPalindrome(self, s: str) -> bool:
+        start = 0
+        end = len(s) - 1
+        while(start < end):
+            if s[start] != s[end]:
+                #check if second half is palindrome
+                if s[start+1: end+ 1] == s[start+1:end+1][::-1]:
+                    return True
+                #check if first half is palindrome
+                elif s[start: end] == s[start:end][::-1]:
+                    return True
+                #neither
+                else:
+                    return False
+            start += 1
+            end -= 1
+        return True
+ 
+ 
+ 
+ 
+ 
+ 
+Dot Product of Two Sparse Vectors
+Brute force: 
+
+Time Complexity: O(n) since we looping the array
+Space Complexity: O(n) for the array
+class SparseVector:
+    def __init__(self, nums: List[int]):
+        self.nums = nums
+        
+    # Return the dotProduct of two sparse vectors
+    def dotProduct(self, vec: 'SparseVector') -> int:
+        sum = 0
+        for i in range(len(vec.nums)):
+            if vec.nums[i] != 0 and self.nums[i] != 0:
+                sum = sum + vec.nums[i] * self.nums[i]
+        return sum
+
+Or for better approach
+
+Time Complexity: O(n) for init, potentially constant at dot product (if it is truly very sparse)
+Space Complexity: O(n) at init, constant for dot product.
+def __init__(self, nums: List[int]):
+        self.indices = {}
+        # enumerate gives us the index and the value!
+        for i, n in enumerate(nums):
+            if n != 0:
+                self.indices[i] = n
+                
+	# Return the dotProduct of two sparse vectors
+   def dotProduct(self, vec: 'SparseVector') -> int:
+        result = 0
+        # items basically returns tuples of key-value pairs in a list.
+        for j, n in vec.indices.items():
+	        if j in self.indices:
+		        result += n * self.indices[j]
+        return result
+
+ Buildings With an Ocean View
+Time Complexity: O(n) since we go over each element once.
+Space Complexity: O(n) in the worst case. 
+
+class Solution:
+    def findBuildings(self, heights: List[int]) -> List[int]:
+        max_height = heights[-1]
+        result = [len(heights)-1]
+        #start from the end of the list
+        for index in range(len(heights)-2, -1, -1):
+            if heights[index] > max_height:
+                result.append(index)
+                max_height = heights[index]
+        #reverse the order
+        return result[::-1]
+
+Range Sum of BST
+Time: O(n) since go over each element once
+Space: O(n) since nodes set can be n size at worst. 
+
+class Solution:
+    total = 0
+    def rangeSumBST(self, root: TreeNode, low: int, high: int) -> int:
+        def helper(root, low, high):
+            if root == None:
+                return
+            if root.val >= low and root.val <= high:
+                self.total += root.val
+            helper(root.left, low, high)
+            helper(root.right, low, high)
+            return
+        helper(root, low, high)
+        return self.total
+
+Lowest Common Ancestor of a Binary Tree III
+Time: O(Max of depth of p or q)
+Space: O(log n) approximately, O(n) worst case where every node is p’s parent.
+
+class Solution:
+    def lowestCommonAncestor(self, p: 'Node', q: 'Node') -> 'Node':
+        p_node = set()
+        #add all parents of p to p_node
+        while(p):
+            p_node.add(p.val)
+            p = p.parent
+        #when q first parent is in p_node, return that
+        while(q):
+            if q.val in p_node:
+                return q
+            else:
+                q = q.parent
+        return Node(-1)
+
+Subarray sum equals k - Osman Solution, no clue how it works
+Time: Simply O(n)
+Space: O(n) for the count dictionary.
+def subarraySum(self, nums: List[int], k: int) -> int:
+        # so since we dont have to return specific subrarrays, this simplifies things
+        # we can keep a running sum so far. if the current num 
+        
+        # purpose of the count is in case runningSum stays constant cuz 0's or in case
+        # negative numbers make it return to a previous runningSum.
+        count = {}
+        runningSum = 0
+        result = 0
+
+        for num in nums:
+            runningSum += num
+            
+            if runningSum == k: # simply if the sum upto this point equals k  
+                result += 1
+            
+            diff = runningSum-k # this represents how each time we encounter a diff of k
+            # then that means there is some subarray with that sum
+            result += count.get(diff, 0) # if it exists add to result, otherwise add 0
+                
+            # if it exists, increment, otherwise set it to 1
+            count[runningSum] = count.get(runningSum, 0) + 1
+
+        return result
+
+Vertical Order Traversal of a Binary Tree
+Time complexity: O(nlog n) #since we are sorting
+Space complexity: O(N) #the stack contains all the nodes
+
+   def verticalTraversal(self, root: Optional[TreeNode]) -> List[List[int]]:
+	#save all the nodes in an array with row, col and value
+        def dfs(row, col, root):
+            if root == None:
+                return root
+            left = dfs(row-1, col + 1, root.left)
+            right = dfs(row+1, col + 1, root.right)
+            self.result.append((row, col, root.val))
+        self.result = []
+        dfs(0, 0, root)
+	#sort the array in terms of row and col
+        self.result.sort()
+        firstRow = self.result[0][0]
+        result = [[]]
+        index = 0
+	#insert corresponding to row
+        for row, col, num in self.result:
+            if firstRow == row:
+                result[index].extend([num])
+            else:
+                index += 1
+                result.append([num])
+                firstRow = row
+        return result
+
+K Closest Points to Origin
+Time: O(nlogk) 
+Space: O(k)
+import heapq
+class Solution:
+    def kClosest(self, points: List[List[int]], K: int) -> List[List[int]]:
+        heap = []
+        for (x, y) in points:
+            dist = (x*x + y*y) #heap is min-heap in python
+            if len(heap) == K:
+                heapq.heappushpop(heap, (dist, x, y)) #removes worst one and best new one
+            else:
+                heapq.heappush(heap, (dist, x, y)) 
+        
+        return [[x,y] for (dist,x, y) in heap]
+
+
+Convert Binary Search Tree to Sorted Doubly Linked List
+Time Complexity: O(n) since going over each node once
+Space Complexity: O(1)  since we are not storing anything extra (anything more than constant).
+def treeToDoublyList(self, root: 'Node') -> 'Node':
+        # if the tree is empty, simply return the root
+        if not root:
+            return None
+        
+        dummy = Node(0)
+        prev = dummy
+        
+        def inorder(current, prev):
+            # if current is null, return prev which will not be null
+            if not current:
+               return prev
+        
+            # keep recursively calling till left most node.
+            prev = inorder(current.left, prev)
+            
+            # make connection between the two nodes (1->, <-2) for example
+            prev.right = current
+            current.left = prev
+            
+            # set prev to current since it is the new "prev" we should be considering. 
+            prev = current
+            # recursively till right most node (3 from root 2)
+            prev = inorder(current.right, prev)
+            
+            return prev
+        
+        prev = inorder(root, prev)
+        dummy.right.left = prev
+        prev.right = dummy.right
+        return dummy.right
+
+Making a large island
+Constraints:
+n == grid.length
+n == grid[i].length
+1 <= n <= 500
+grid[i][j] is either 0 or 1.
+Time: O(2*n^2) = O(n^2) since we visit every point (possibly twice).
+Space: O(n^2): to keep track of and maintain the grid.
+def largestIsland(self, grid: List[List[int]]) -> int:
+        # overall the idea is to use dfs to get all the islands, and change the values
+        # in the grid to represent different islands. then go thru the whole grid again
+        # and if we see any 0's look at the values in the 4 spots it connects to, and
+        # add the potential area of those islands + 1 for the current! keep the max!
+        dim = len(grid)
+        # return list of possible coordinates we can go to. 
+        def possibles(x, y):
+            result = []
+            for i, j in ((0, 1), (1, 0), (0, -1), (-1, 0)):
+                if 0 <= x + i < dim and 0 <= y + j < dim:
+                    result.append((x+i, y+j))
+            return result
+        
+        # the idea is to mark all the coordinates part of this island by a unique index
+        # also we wanna keep a running total of the area
+        def dfs(i, j, index):
+            area = 0
+            grid[i][j] = index
+            for x, y in possibles(i, j):
+                if grid[x][y] == 1:
+                    area += dfs(x, y, index)
+            return area+1 # plus 1 for the start of the island which was not added calling dfs
+        index = 2 # start with 2 since the given grid is 0's and 1's
+        
+        # constructs a map of areas of islands, and their indices, where their indices
+        # are also the value they occupy in the grid now!
+        areas = {}
+        for i in range(dim):
+            for j in range(dim):
+                if grid[i][j] == 1:
+                    areas[index] = dfs(i, j, index)
+                    index += 1
+        
+        areas[0] = 0 # to ensure the below line has some value.
+        curMax = max(areas.values())
+        for i in range(dim):
+            for j in range(dim):
+                if grid[i][j] == 0:
+                    # gets the coordinates that would be connected to this coordinate
+                    # if we placed a 1 here. 
+                    connections = possibles(i, j)
+                    newArea = 1 # start with 1 to include the 0 we just changed to 1
+                    considered = set() #used to ensure we dont add the same islands area twice
+                    for x, y in connections:
+                        if grid[x][y] not in considered:
+                            newArea += areas[grid[x][y]]
+                            considered.add(grid[x][y])
+                    curMax = max(curMax, newArea)
+        return curMax
+
+
+Minimum Add to Make Parentheses Valid
+Time: O(n) since we go thru each character once
+Space: O(1) nothing stored extra.
+
+class Solution:
+    def minAddToMakeValid(self, s: str) -> int:
+        openBrace = 0
+        close = 0
+        if len(s) == 0:
+            return 0
+        for i in s:
+            #if open brace
+            if i == "(":
+                openBrace += 1
+            #check that there exist an open brace and i is closing
+            elif openBrace >= 1 and i == ")":
+                openBrace -= 1
+            #if there isnt an opening brace
+            elif openBrace <= 0 and i == ")":
+                close += 1
+        #add the amount of unused open and closed braces
+        return openBrace + close
+                
+Kth Largest Element in an Array
+Time Complexity: O(nlog k) since n is for looping each number and log k is for each push()
+Space Complexity: O(k) since we are storing k elements
+
+class Solution:
+    def findKthLargest(self, nums: List[int], k: int) -> int:
+        heap = []
+        #loop through each num
+        for num in nums:
+            #add the first k elements
+            if len(heap) < k:
+                heapq.heappush(heap,num)
+            #after k elements are added, you remove the smallest element
+            elif len(heap) == k:
+                heapq.heappushpop(heap, num)
+        #the last pop is the largest element
+        return heapq.heappop(heap)
+
+Lowest Common Ancestor of a Binary Tree
+Time: O(n) in worst case to construct node to parent dict. O(logn) while loops at the end
+Space: O(n) for the dictionary and the stack. 
+def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        stack = [root]
+        nodeToParent = {root: None}
+        
+        # construct a node to parent dictionary (up until we get p and q)
+        while p not in nodeToParent or q not in nodeToParent:
+            node = stack.pop()
+            if node.left:
+                nodeToParent[node.left] = node
+                stack.append(node.left)
+            if node.right:
+                nodeToParent[node.right] = node
+                stack.append(node.right)
+        
+        ancestors = set()
+        # follow up p adding its parents/ancestors along the way
+        while p:
+            ancestors.add(p)
+            p = nodeToParent[p]
+            
+        # do the same on q, but this time check if q's parent
+        # or ancestors is in ancestors bfr moving up, 
+        # cuz we want the lowest common ancestor.
+        while q not in ancestors:
+            q = nodeToParent[q]
+        return q
+    
+
+Random Pick with weight 
+
+Sumuhash Soln:
+
+TIme Complexity: O(1) for both
+Space: O(n) storing w in a list
+class Solution:
+    def __init__(self, w: List[int]):
+        self.index = 0
+        self.w = w
+        self.running = 0
+        self.sum = w[0]
+        self.size = sum(w)
+
+
+    def pickIndex(self) -> int:
+        print(self.index)
+    
+        if self.index < len(self.w) and self.running != self.sum:
+            self.running += 1
+            return self.index
+        
+        elif self.index + 1 < len(self.w) and self.running == self.sum:
+            self.sum += self.w[self.index+ 1]
+            self.running += 1
+            self.index += 1
+            return self.index
+        else:
+            self.running = 1
+            self.sum = self.w[0]
+            self.index = 0
+            return self.index
+            
+   Osman Soln:
+
+Time: init takes O(n), pick takes O(log n) cuz binary search
+Space: O(n) for init, constant for pick.
+def __init__(self, w: List[int]):
+        # this way we create an array for [1, 5, 3] such as [1, 6, 9]
+        # now each range represents probability. from 0-1 is 1's probability, 1-6 is 5's, 6-9 is 3's
+        for i in range(1,len(w)):
+            w[i] += w[i-1]
+        self.w = w
+
+    def pickIndex(self) -> int:
+        # now we just do binary search to find index to insert random int between 1 and 9.
+        left = 0 
+        right = len(self.w)-1
+        target = random.randint(1, self.w[right])
+        while left < right:
+            mid = (right+left)//2
+            if target <= self.w[mid]:
+                right = mid
+            else:
+                left = mid+1
+        return left
+
+Binary Tree Right Side View
+Time Complexity: O(n) cause need to view every node once
+Space Complexity: O(n) cause storing our result
+
+class Solution:
+    def rightSideView(self, root: Optional[TreeNode]) -> List[int]:
+        #track depth in a set, if not there then add, else dont add
+        #dfs on root, right, then left
+        self.visited = set()
+        self.result = []
+        #to go through each node, starting with root, right, left
+        def dfs(root, depth, result):
+            if root == None:
+                return 
+            #if we nvr saw that depth, we append to the list, since right view
+            if depth not in self.visited:
+                self.visited.add(depth)
+                self.result.append(root.val)
+        #gotta check both sides still, cause we dont know the full heigh of tree
+            dfs(root.right, depth + 1, result)
+            dfs(root.left, depth + 1, result)
+            return
+        
+        dfs(root, 0, [])
+        return self.result
+
+Verifying an Alien Dictionary
+Let N  be the length of order, and
+M be the total number of characters in words.
+TIme COmplexity: O(M) since hashmap is fixed to 26 letters, we can assume O(1) on that
+Space: O(1) since hashmap is fixed length of 26
+
+class Solution:
+    def isAlienSorted(self, words: List[str], order: str) -> bool:
+        letter_to_order = {}
+        i = 0
+        for letter in order:
+            letter_to_order[letter] = i
+            i += 1
+        for i in range(len(words) - 1):
+            for j in range(len(words[i])):
+                # If we do not find a mismatch letter between words[i] and words[i + 1],
+                # we need to examine the case when words are like ("apple", "app").
+                if j >= len(words[i + 1]): return False
+
+                if words[i][j] != words[i + 1][j]:
+                    if letter_to_order[words[i][j]] > letter_to_order[words[i + 1][j]]: return False
+                    # if we find the first different character and they are sorted,
+                    # then there's no need to check remaining letters
+                    break
+
+        return True
+
+
+Add Strings
+Time: O(max length of num1,num2)
+Space: O(1). not storing anything extra other than numbers. 
+
+class Solution:
+    def addStrings(self, num1: str, num2: str) -> str:
+        char_to_int = {"1": 1, "0": 0, "2": 2, "3": 3, "4": 4, "5": 5, "6":6, "7":7, "8":8, "9": 9}
+        
+        carryOver = 0
+        index_one = len(num1) - 1
+        index_two = len(num2) - 1
+        ans = ""
+        while(index_one >= 0 and index_two >= 0):
+            one = char_to_int[num1[index_one]]
+            two = char_to_int[num2[index_two]]
+            result = one + two + carryOver
+            #this is to calculate the carryOver
+            if result >= 10:
+                #take the floor of the division
+                carryOver = result//10
+                result = result - 10
+            #remove carryOver, when not needed    
+            else:
+                carryOver = 0
+            ans += str(result)
+            index_one -= 1
+            index_two -= 1
+        
+        while(index_one >= 0):
+            result = char_to_int[num1[index_one]] + carryOver
+            if result >= 10:
+                carryOver = result//10
+                result = result - 10
+            else:
+                carryOver = 0
+            ans += str(result)
+            index_one -= 1
+        
+        while(index_two >= 0):
+            result = char_to_int[num2[index_two]] + carryOver
+            if result >= 10:
+                carryOver = result//10
+                result = result - 10
+            else:
+                carryOver = 0
+            ans += str(result)
+            index_two -= 1
+        #last iteration carryOver
+        if carryOver > 0:
+            ans += str(carryOver)
+        #since we started last to start, we need to reverse it
+        return ans[::-1]
+
+Next Permutation - Osmans
+Constraints:
+Time: O(n) in the worse case. we do multiple iterations over the list but all add up still O(n)
+Space: O(1) as we modified in place!
+def nextPermutation(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        i = len(nums) - 1
+        # loop goes till i = 0 or the ith index value is greater than the one before it. 
+        # doesnt execute at all for 1, 1, 5
+        while i > 0 and nums[i] <= nums[i-1]:
+            i -= 1
+            
+        # if i reaches 0, that means all the values are <= the one before it. i.e sorted in descending
+        if i == 0:
+            nums.reverse()
+            return
+
+        
+        k = i - 1 # gets the index where nums[i-1] was less than nums[i]
+        j = len(nums) - 1
+        # find index j such that j index is actually greater and swap with the index k value
+        # k index which is where the "decrease" starts! j index is first element greater than k
+        # from the end of the list!
+        # for 1, 1, 5 this will simply be 5 swapping with the 1.
+        while nums[j] <= nums[k]:
+            j -= 1
+        nums[k], nums[j] = nums[j], nums[k]  
+        
+        l = k+1
+        r = len(nums)-1
+        # for the rest of the elements after k, simply need to reverse them. for 1, 1, 5 l == r after 
+        # swapping the 1 and 5
+        # if we have 11541, our end goal is 14115. above, we will swap index 1 and index 3 cuz index 1 
+        # will be k cuz thats where the ascending from the back ends. index 3 will be 4 cuz thats the
+        # first element in the sorted part (or from the back of the list) that is greater than the
+        # value at index 1. can think of it as the smallest value in the "sorted" part that is greater
+        # than the current value. after that swap we will have 14511. now for everything after index 1
+        # we wanna make it "minimum" i.e sorted in ascending order. Since 4 was the first value greater
+        # than 1 in the initial "sorted" part, swapping them will keep the sorted part sorted. now 
+        # remember the sorted part is ascending from the back, or descending from its start at value 5.
+        # so we simply wanna reverse it!
+        while l < r:
+            nums[l], nums[r] = nums[r], nums[l]
+            l +=1
+            r -= 1
+
+Basic Calculator II
+Time: O(n) since going over each character once and popping is constant.
+Space: O(n) for our stack. 
+
+class Solution:
+    def calculate(self, s: str) -> int:
+        stack = []
+        #runningCount total of the current number
+        currNumber = 0
+        #store previous operation, since when we see new op, we first handle prev
+        prev_operation = '+'
+        result = 0
+        for index in range(len(s)):
+            item = s[index]
+            #ignore white spaces
+            if item == " ":
+                continue
+                
+            #handling the previous operation stuff
+            elif item in {"+", "-", "*", "/"}:
+                if prev_operation == "+":
+                    stack.append(currNumber)
+                #easy to add later if we multiply by (-1) now
+                elif prev_operation == "-":
+                    stack.append(currNumber*(-1))
+                elif prev_operation == "*":
+                    prevNum = stack.pop()
+                    stack.append(currNumber*prevNum)
+                elif prev_operation == "/":
+                    prevNum = stack.pop()
+                    #we need to take floor but we cant use // cause negative numbers
+                    stack.append(int(prevNum/currNumber))
+                prev_operation = item
+                currNumber = 0
+            #we multply by 10 to increase the base 10, then add the 0th
+            elif item.isnumeric():
+                currNumber = (currNumber * 10) + (ord(item) - ord('0'))
+                
+        #take into consideration of the last number
+        if prev_operation == "+":
+            stack.append(currNumber)
+        elif prev_operation == "-":
+            stack.append(currNumber*(-1))
+        elif prev_operation == "*":
+            prevNum = stack.pop()
+            stack.append(currNumber*prevNum)
+        elif prev_operation == "/":
+            prevNum = stack.pop()
+            stack.append(int(prevNum/currNumber))
+        
+        #all all the numbers in the stack
+        for number in stack:
+            result += number
+        return result
+
+
+Maximum Swap
+Time: O(n) where n is the amount of digits in num
+Space:O(n) where n is the amount of digits in num
+
+class Solution:
+    def maximumSwap(self, num: int) -> int:
+        result = 0
+        num_list = []
+        
+        #keep on removing last digit and adding to list
+        while(num > 0):
+            remaining = num // 10
+            num_list.append(num % 10)
+            num = remaining
+        
+        #reverse list to get the correct order
+        num_list = num_list[:: -1]
+ 
+        
+        last = {}
+        #take the most later index of the digit
+        for i, dig in enumerate(num_list):
+            last[dig] = i 
+        found = False
+        #check if the first digit u see thats less than anything in the list after current Index
+        for i,digit in enumerate(num_list):
+            for number in range(9,digit,-1):
+                if number in last and last[number] > i:
+                    num_list[last[number]],num_list[i]=num_list[i],num_list[last[number]]
+                    found = True
+                    break
+            if found:
+                break
+                
+                    
+            
+        #multply 10 to add a new base 10
+        for digit in num_list:
+            result = (result * 10) + digit
+        
+        return result
+
+
+
+
+Maximum Sum of Two Non-overlapping subarrays - Osmans
+Time: O(n)
+Space: O(n)
+def maxSumTwoNoOverlap(self, nums: List[int], firstLen: int, secondLen: int) -> int:
+        """
+        Lets track a running sum upto each point. firstLen and secondLen dont
+        matter in themselves, so the first subarray could be before or after
+        the second subarray. We have to consider creating both first, and then the 
+        other. 
+        
+        using running sum, we can get max subarray sum.
+        for each index i from first+second to end of runningSum list,
+        i - second - (i-first-second) = first
+        
+        i - (i - second) = second
+        """
+        def maxSum(first, second) -> int:
+            maxFirst = 0
+            ans = 0
+            for i in range(first + second, len(runningSum)):
+                firstSum = runningSum[i - second] - runningSum[i - first - second]
+                maxFirst = max(maxFirst, firstSum)
+                
+                secondSum = runningSum[i] - runningSum[i - second]
+                ans = max(ans, maxFirst + secondSum)
+                
+            return ans
+        # need 0 at index 0 cuz the first k elements sum - sum[0] and sum[0] = 0
+        runningSum = [0] * (len(nums) + 1)
+        for i, a in enumerate(nums):
+            runningSum[i + 1] = runningSum[i] + a
+        return max(maxSum(firstLen, secondLen), maxSum(secondLen, firstLen))
+
+
+Find Peak Element (Find Local Minima) - Osmans
+Constraints:
+1 <= nums.length <= 1000
+-231 <= nums[i] <= 231 - 1
+nums[i] != nums[i + 1] for all valid i.
+Time: O(log n) cuz binary search
+Space: O(1) nothing stored. 
+def findPeakElement(self, nums: List[int]) -> int:
+        """
+        Basic Idea: Binary search
+        Elaboration: 
+        if an element(not the right-most one) is smaller than its right neighbor, 
+        then there must be a peak element on its right, because the elements on its 
+        right is either 
+        1. always increasing  -> the right-most element is the peak
+        2. always decreasing  -> the left-most element is the peak
+        3. first increasing then decreasing -> the pivot point is the peak
+        4. first decreasing then increasing -> the left-most element is the peak  
+        Therefore, we can find the peak only on its right elements( cut the array to 
+        half)
+        The same idea applies to that an element(not the left-most one) is smaller 
+        than its left neighbor.
+        Conditions
+        1. array length is 1  -> return the only index 
+        2. array length is 2  -> return the bigger number's index 
+        3. array length is bigger than 2 -> 
+           (1) find mid, compare it with its left and right neighbors  
+           (2) return mid if nums[mid] greater than both neighbors
+           (3) take the right half array if nums[mid] smaller than right neighbor
+           (4) otherwise, take the left half
+        """
+        left = 0
+        right = len(nums)-1
+
+        # handle condition 3
+        while left < right-1:
+            mid = int((left+right)/2)
+            if nums[mid] > nums[mid+1] and nums[mid] > nums[mid-1]:
+                return mid
+
+            if nums[mid] < nums[mid+1]:
+                left = mid+1
+            else:
+                right = mid-1
+
+        #handle condition 1 and 2
+        return left if nums[left] >= nums[right] else right
+
+
+Simplify Path
+
+Time: O(n) where n is the number of slashes in the given path.
+Space: O(n) again for the stack and result. 
+
+class Solution:
+    def simplifyPath(self, path: str) -> str:
+        #stack
+        canonical = []
+        #split with "/" to get all the words
+        path_list = path.split("/")
+        result = ""
+        for index in range(1, len(path_list)):
+            #if its .., we remove the last directory we saw
+            if path_list[index] == ".." and len(canonical) > 0:
+                canonical.pop()
+            #if we see words, store it in stack
+            elif path_list[index] not in {"..", ".", ""}:
+                canonical.append(path_list[index])
+        #if stack is empty, we return home directory
+        if len(canonical) == 0:
+            return "/"
+        #else we store every word in a string
+        for directory in canonical:
+            result = result + "/" + directory
+        return result
+
+Network Delay Time - Dijkstra 
+Time Complexity of Dijkstra's Algorithm is O ( V 2 ) but with min-priority queue it drops down to O ( V + E l o g V ) .
+Time Complexity of the implementation is O(V^2). If the input graph is represented using adjacency list, it can be reduced to O(E log V) with the help of a binary heap. Please see 
+Dijkstra’s Algorithm for Adjacency List Representation for more details.
+
+from queue import PriorityQueue
+class Solution:
+    def networkDelayTime(self, times: List[List[int]], n: int, k: int) -> int:
+        #store node with their edges
+        source_to_destination = collections.defaultdict(list)
+        
+        #store node and shortest weight value, intialize to positive infinity
+        node_to_weight = {i: math.inf for i in range(1, n+1)}
+        
+        #store head node to 0
+        node_to_weight[k] = 0
+        
+        #priority queue to check non-visited nodes
+        queue = PriorityQueue()
+        
+        #actually doing the storing nodes with their edges + weight
+        for s, d, w in times:
+            source_to_destination[s].append((d, w))
+            
+        #add start node with intial weight of 0 to queue
+        #start with weight then node, because priority is checked on firsr elem
+        queue.put((0, k))
+        
+        #visited set so we dont loop back to see nodes again
+        visited = set()
+        
+        while(queue.qsize() >0):
+            #get smallest weight node we havent seen yet
+            u_weight, u = queue.get()
+            
+            #mark as visited
+            visited.add(u)
+            
+            #get neighbours
+            neighbours = source_to_destination[u]
+            
+            #for each neightbour we see, get its neighbout and its weight to u-node
+            for neighbour, n_weight in neighbours:
+                #ignore if we seen the node
+                if neighbour in visited:
+                    continue
+                
+                #check if neighbour weight to u-node + current smallest weight of u is 
+                #smaller than existing weight of neighbour
+                #basically if its not, that means we have another route thats smaller
+                if n_weight + u_weight < node_to_weight[neighbour]:
+                    
+                    #new smallest weight for neighbour
+                    node_to_weight[neighbour] = n_weight + u_weight
+                    
+                    #add neighbour to queue
+                    queue.put((n_weight + u_weight, neighbour))
+        max_value = 0
+        value = max(node_to_weight.values())
+        return value if value != math.inf else -1
+
+Valid Word Abbreviation:
+Time: O(n) where n is length of abbr
+Space: O(1) nothing stored relative to input.
+
+class Solution:
+    def validWordAbbreviation(self, word: str, abbr: str) -> bool:
+        word_index = 0
+        abbr_index = 0
+        number = "0"
+        if word == abbr:
+            return True
+        while(abbr_index < len(abbr)):
+            if word_index >= len(word):
+                return False
+            if abbr[abbr_index].isalpha() and abbr[abbr_index] == word[word_index]:
+                abbr_index += 1
+                word_index += 1
+            elif abbr[abbr_index].isalpha() and abbr[abbr_index] != word[word_index]:
+                return False
+            
+            #looping till you dont have a number anymore
+            while(abbr_index < len(abbr) and abbr[abbr_index].isnumeric()):
+                if abbr[abbr_index] == '0' and number == '0':
+                    return False 
+                number += abbr[abbr_index]
+                abbr_index += 1
+            #add the number to word index
+            word_index += int(number)
+            number = "0"
+        return word_index == len(word)
+
+Diameter of a binary tree
+Time: O(n) visit eash node once
+Space: O(n) for the call stack.
+def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
+        """
+        simple recursion on left and right subtrees. 
+        
+        """
+        self.answer = 0
+         take ur time bro, cause shes gonna think u know the solution 
+
+        def diameterHelper(node):
+            if not node:
+                return 0
+            left = diameterHelper(node.left)
+            right = diameterHelper(node.right)
+            
+            self.answer = max(self.answer, left+right+1)
+            
+            # the return value can only choose one of left and right to continue path
+            return max(left, right) + 1
+        diameterHelper(root)
+        return self.answer-1
+
+X to the power n, Pow(x, n), Power of x to n
+Constraints:
+-100.0 < x < 100.0
+-231 <= n <= 231-1
+-104 <= xn <= 104
+Time: O(logn) cuz n split by half each time
+Space: O(log n) for the call stack.
+def myPow(self, x: float, n: int) -> float:
+        """
+        cant use ** or power function of course. simple solution is to iterate upto
+        n times, and multiply running product by x each time (starting from 1).
+        
+        however this can be optimized for when n is even vs odd.
+        if n is even, then x^n = (x^2)^(n/2). if n is odd, then x^n = x* x^n-1 where 
+        n-1 is even now.
+        2^8 = (2^2)^4 = (4^2)^2 = 16^2
+        """
+        def myPowHelper(b, exp):
+            if exp == 0:
+                return 1
+            if exp == 1 or b == 1:
+                return b
+            if exp % 2 == 0:
+                return myPowHelper(b*b, exp/2)
+            else:
+                return b*myPowHelper(b*b, (exp-1)/2)
+        if n < 0:
+            n = -n
+            x = 1/x
+        return myPowHelper(x, n)
+
+Nested List Weight Sum
+Time: O(n) where n is number of ints
+Space: O(depth) for call stack.
+
+class Solution:
+    def depthSum(self, nestedList: List[NestedInteger]) -> int:
+        """
+        for each nestList object, recursively call some helper to get the sum of the
+        current object. after considering all. for each recursive call, pass in the
+        the depth as well. the sum should be a global variable relative to the
+        helper function
+        """
+        def helperDepthSum(nested, depth):
+            if nested.getInteger() != None:
+                self.sum += depth*nested.getInteger()
+            if nested.getList() != None:
+                for otherNestedInt in nested.getList():
+                    helperDepthSum(otherNestedInt, depth + 1)
+        self.sum = 0
+        for nL in nestedList:
+            helperDepthSum(nL, 1)
+        return self.sum
+
+Word Break II
+
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> List[str]:
+        stack = [["", 0]]
+        outcomes = []
+        set_word = set()
+        #allows o(1) check for each word
+        for word in wordDict:
+            set_word.add(word)
+        
+        while(len(stack) != 0):
+            result, start = stack.pop()
+            #we found a combination that works
+            if start == len(s):
+                outcomes.append(result)
+            runningStr = ""
+            #check from start to end of string, and see if theres another word
+            for i in range(start, len(s)):
+                runningStr += s[i]
+                if runningStr in set_word and result != "":
+                    stack.append([result + " " + runningStr, i+1])
+                elif runningStr in set_word:
+                    stack.append([runningStr, i+1])
+        return outcomes
+                
+
+Remove all adjacent duplicates in string
+Time: O(n)
+Space: O(n)
+only works for 2 adjacent duplicates
+Dont use these examples
+Ex. abbbac -> abac
+Ex. abbac -> ac
+def removeDuplicates(self, s: str) -> str:
+        stack = []
+        for ch in s:
+            if stack and stack[-1] == ch:
+                stack.pop()
+            else:
+                stack.append(ch)
+        return "".join(stack)
+
+Vertical order Traversal of a binary tree
+TIme: O(N log N) since we are sorting by row
+Space: O(N) since we are storing all the nodes
+
+class Solution:
+    def verticalTraversal(self, root: Optional[TreeNode]) -> List[List[int]]:
+        def dfs(row, col, root):
+            if root == None:
+                return root
+            left = dfs(row-1, col + 1, root.left)
+            right = dfs(row+1, col + 1, root.right)
+            self.result.append((row, col, root.val))
+        self.result = []
+        #get all the nodes with correct row and col placements
+        dfs(0, 0, root)
+        
+        #sort it by row
+        self.result.sort()
+        firstRow = self.result[0][0]
+        result = [[]]
+        index = 0
+        #if they have the same row, extend to the indexth, else add a new list in result
+        for row, col, num in self.result:
+            if firstRow == row:
+                result[index].extend([num])
+            else:
+                index += 1
+                result.append([num])
+                firstRow = row
+        return result
+
+Continuous Subarray Sum
+Time: O(n) worst case. 
+Space: O(n) 
+
+class Solution:
+    def checkSubarraySum(self, nums: List[int], k: int) -> bool:
+        # key would be remainder and value will be index
+        remainder_dict = {}
+        
+        # cumulative sum
+        cum_sum = 0
+        
+        for i, v in enumerate(nums):
+            # update cumulative sum
+            cum_sum += v
+            print(cum_sum)
+            
+            # check the remainder
+            rem = cum_sum % k
+
+            # check if this remainder came up historically
+            # and get the index when it came up
+            # if not get i (the current index)
+            prv_index = remainder_dict.get(rem, i)
+            
+            # if we saw the same remainder historically 
+            # it means from prv_index to current index i
+            # exactly multiple of k is added (zero is multiple of k)
+            if (i-prv_index >= 2) or (rem==0 and i>0):
+                return True
+            
+            # update the remainder dict
+            # but if remainder already exist as key, don't update it
+            if rem not in remainder_dict:
+                remainder_dict[rem] = i
+            
+            print(remainder_dict)
+
+        return False
+
+Exclusive Time of Functions
+Constraints:
+1 <= n <= 100
+1 <= logs.length <= 500
+0 <= function_id < n
+0 <= timestamp <= 10^9
+No two start events will happen at the same timestamp.
+No two end events will happen at the same timestamp.
+Each function has an "end" log for each "start" log.
+Time: O(l) where l is number of logs
+Space: O(n + l) where n is for times list and l is for the stack/for loop variables
+def exclusiveTime(self, n: int, logs: List[str]) -> List[int]:
+        times = [0] * n
+        stack = []
+        previousTime = 0
+        
+        for log in logs:
+            fnc, action, time = log.split(":")
+            fnc = int(fnc)
+            time = int(time)
+            
+            if action == "start":
+                # if the stack is non empty, then add the diff of this time and previous time to the last
+                # function to start's exclusive time
+                if stack != []:
+                    times[stack[-1]] += (time - previousTime)
+                previousTime = time
+                stack.append(fnc)
+            else: # if end, then pop and add the same diff as above and add 1 based on prob description 
+                times[stack.pop()] += (time + 1 - previousTime)
+                previousTime = time + 1
+        return times
+
+Expression Add Operators
+Time: O(4^n-1) since 4 operators (+, -, *, no op i.e combine digit) and n-1 spots to place it in.
+Space: O(1) relative to n (if n is large).
+def addOperators(self, num: str, target: int) -> List[str]:
+        # prev is used to track the previous value we computed. only used and needed for multiplication case
+        # value is used to track the current value of expr
+        # expr is used to track the current expression.
+        def dfs(i, expr, value, prev):
+            # can only return if we've considered the whole string and current value is equal to target.
+            if i == len(num) and value == target:
+                result.append(expr)
+                return
+            
+            for j in range(i+1, len(num) + 1):
+                numPartStr = num[i:j]
+                
+                # skip current iteration if numPartStr starts w 0 and it isnt 0 itself
+                if numPartStr[0] == '0' and numPartStr != '0':
+                    continue
+                    
+                numPart = int(numPartStr)
+                
+                if expr == "":
+                    dfs(j, numPartStr, numPart, numPart)
+                else:
+                    dfs(j, expr + "+" + numPartStr, value + numPart, numPart)
+                    
+                    # use -numPart for prev parameter so when it is subtracted from value, its actually added back to value as wanted. 
+                    dfs(j, expr + "-" + numPartStr, value - numPart, -numPart)
+                    
+                    # we do value-prev cuz BEDMAS, so subtract prev, and then multiply it by numPart and add to value
+                    dfs(j, expr + "*" + numPartStr, value-prev + prev*numPart, prev*numPart)
+                        
+        result = []        
+        dfs(0, "", 0, 0)
+        return result
+
+Moving Average From Data Stream
+from queue import Queu
+class MovingAverage:
+
+    def __init__(self, size: int):
+        self.queue = collections.deque()
+        self.runningCount = 0
+        self.size = size
+        
+
+    def next(self, val: int) -> float:
+        self.queue.append(val)
+        self.runningCount += 1
+        if len(self.queue) > self.size:
+            self.queue.popleft()
+            self.runningCount -= 1
+        return sum(self.queue)/self.runningCount
+
+Trie
+
+class TrieNode:
+    """A node in the trie structure"""
+
+    def __init__(self, char):
+        # the character stored in this node
+        self.char = char
+
+        # whether this can be the end of a word
+        self.is_end = False
+
+        # a counter indicating how many times a word is inserted
+        # (if this node's is_end is True)
+        self.counter = 0
+
+        # a dictionary of child nodes
+        # keys are characters, values are nodes
+        self.children = {}
+
+class Trie(object):
+    """The trie object"""
+
+    def __init__(self):
+        """
+        The trie has at least the root node.
+        The root node does not store any character
+        """
+        self.root = TrieNode("")
+    
+    def insert(self, word):
+        """Insert a word into the trie"""
+        node = self.root
+        
+        # Loop through each character in the word
+        # Check if there is no child containing the character, create a new child for the current node
+        for char in word:
+            if char in node.children:
+                node = node.children[char]
+            else:
+                # If a character is not found,
+                # create a new node in the trie
+                new_node = TrieNode(char)
+                node.children[char] = new_node
+                node = new_node
+        
+        # Mark the end of a word
+        node.is_end = True
+
+        # Increment the counter to indicate that we see this word once more
+        node.counter += 1
+        
+    def dfs(self, node, prefix):
+        """Depth-first traversal of the trie
+        
+        Args:
+            - node: the node to start with
+            - prefix: the current prefix, for tracing a
+                word while traversing the trie
+        """
+        if node.is_end:
+            self.output.append((prefix + node.char, node.counter))
+        
+        for child in node.children.values():
+            self.dfs(child, prefix + node.char)
+        
+    def query(self, x):
+        """Given an input (a prefix), retrieve all words stored in
+        the trie with that prefix, sort the words by the number of 
+        times they have been inserted
+        """
+        # Use a variable within the class to keep all possible outputs
+        # As there can be more than one word with such prefix
+        self.output = []
+        node = self.root
+        
+        # Check if the prefix is in the trie
+        for char in x:
+            if char in node.children:
+                node = node.children[char]
+            else:
+                # cannot found the prefix, return empty list
+                return []
+        
+        # Traverse the trie to get all candidates
+        self.dfs(node, x[:-1])
+
+        # Sort the results in reverse order and return
+        return sorted(self.output, key=lambda x: x[1], reverse=True)
+
+LRU Cache
+Time Complexity: O(1) for everything
+Space: O(capacity): hashmap
+class DLinkedNode(): 
+    def __init__(self):
+        self.key = 0
+        self.value = 0
+        self.prev = None
+        self.next = None
+            
+class LRUCache():
+    def _add_node(self, node):
+        """
+        Always add the new node right after head.
+        """
+        node.prev = self.head
+        node.next = self.head.next
+
+        self.head.next.prev = node
+        self.head.next = node
+
+    def _remove_node(self, node):
+        """
+        Remove an existing node from the linked list.
+        """
+        prevNode = node.prev
+        nextNode = node.next
+
+        prevNode.next = nextNode
+        nextNode.prev = prevNode
+
+    def _move_to_head(self, node):
+        """
+        Move certain node in between to the head.
+        """
+        self._remove_node(node)
+        self._add_node(node)
+
+    def _pop_tail(self):
+        """
+        Pop the current tail.
+        """
+        res = self.tail.prev
+        self._remove_node(res)
+        return res
+
+    def __init__(self, capacity):
+        """
+        :type capacity: int
+        """
+        self.cache = {}
+        self.size = 0
+        self.capacity = capacity
+        self.head, self.tail = DLinkedNode(), DLinkedNode()
+
+        self.head.next = self.tail
+        self.tail.prev = self.head
+        
+
+    def get(self, key):
+        """
+        :type key: int
+        :rtype: int
+        """
+        node = self.cache.get(key, None)
+        if not node:
+            return -1
+
+        # move the accessed node to the head;
+        self._move_to_head(node)
+
+        return node.value
+
+    def put(self, key, value):
+        """
+        :type key: int
+        :type value: int
+        :rtype: void
+        """
+        node = self.cache.get(key)
+
+        if not node: 
+            newNode = DLinkedNode()
+            newNode.key = key
+            newNode.value = value
+
+            self.cache[key] = newNode
+            self._add_node(newNode)
+
+            self.size += 1
+
+            if self.size > self.capacity:
+                # pop the tail
+                tail = self._pop_tail()
+                del self.cache[tail.key]
+                self.size -= 1
+        else:
+            # update the value.
+            node.value = value
+            self._move_to_head(node)
+
+
+Insert Delete GetRandom O(1)
+from random import choice
+class RandomizedSet:
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.hashmap = {}
+        self.arr = []
+        
+        
+
+    def insert(self, val: int) -> bool:
+        """
+        Inserts a value to the set. Returns true if the set did not already contain the specified element.
+        """
+        if val in self.hashmap:
+            return False
+        self.hashmap[val] = len(self.arr)
+        self.arr.append(val)
+        return True
+        
+
+    def remove(self, val: int) -> bool:
+        """
+        Removes a value from the set. Returns true if the set contained the specified element.
+        """
+        if val in self.hashmap:
+             # swapping the last element to be in self.hashmap[val] place in the arr, and then deleting self.hasmap[val] since its at the end now
+            last_element = self.arr[-1]
+            idx = self.hashmap[val]
+            self.arr[idx], self.hashmap[last_element] = last_element, idx
+            # delete the last element
+            self.arr.pop()
+            del self.hashmap[val]
+            return True
+        return False
+        
+        
+
+    def getRandom(self) -> int:
+        """
+        Get a random element from the set.
+        """
+        return choice(self.arr)
+
+Design Underground System
+class UndergroundSystem:
+
+    def __init__(self):
+        self.id_to_time = {}
+        self.stations_to_average = {}
+
+    def checkIn(self, id: int, stationName: str, t: int) -> None:
+        self.id_to_time[id] = (t, stationName)
+
+    def checkOut(self, id: int, stationName: str, t: int) -> None:
+        oldTime, oldStation = self.id_to_time[id]
+        diff = t - oldTime
+        if (oldStation, stationName) in self.stations_to_average:
+            average, freq = self.stations_to_average[(oldStation, stationName)]
+            average = ((average * freq) + diff)/(freq + 1)
+            self.stations_to_average[(oldStation, stationName)] = (average, freq + 1)
+        else:
+            self.stations_to_average[(oldStation, stationName)] = (diff, 1)
+
+    def getAverageTime(self, startStation: str, endStation: str) -> float:
+        return self.stations_to_average[(startStation, endStation)][0]
+
+
+# Your UndergroundSystem object will be instantiated and called as such:
+# obj = UndergroundSystem()
+# obj.checkIn(id,stationName,t)
+# obj.checkOut(id,stationName,t)
+# param_3 = obj.getAverageTime(startStation,endStation)
+
+
+Time Based Key-Value Store
+class TimeMap(object):
+    def __init__(self):
+        self.d = {}
+        
+    def _binary_search(self, values, timestamp):
+        left, right = 0, len(values) - 1
+        
+        while left < right:
+            mid = (left + right) // 2
+            
+            if timestamp > values[mid][1]:
+                left = mid + 1
+            elif timestamp < values[mid][1]:
+                right = mid - 1
+            else:
+                return values[mid][0]
+        
+        if values[right][1] <= timestamp:
+            return values[right][0]
+        
+        return "" if right < 0 else values[right - 1][0]
+    
+    def set(self, key, value, timestamp):
+        if key not in self.d:
+            self.d[key] = []
+            
+        self.d[key].append([value, timestamp])
+
+    def get(self, key, timestamp):
+        if key not in self.d:
+            return ""
+        values = self.d[key]
+        
+        return self._binary_search(values, timestamp)
+
+Min Stack
+class MinStack:
+
+    def __init__(self):
+        self.stack = []
+
+    def push(self, val: int) -> None:
+        #first element in stack, is its own minimum
+        if len(self.stack) == 0:
+            #[value, current Minimum]
+            self.stack.append([val, val])
+            return 
+        minVal = self.stack[-1][1]
+        self.stack.append([val, min(val, minVal)])
+            
+
+    def pop(self) -> None:
+        self.stack.pop()
+
+    def top(self) -> int:
+        return self.stack[-1][0]
+
+    def getMin(self) -> int:
+        return self.stack[-1][1]
+
+
+# Your MinStack object will be instantiated and called as such:
+# obj = MinStack()
+# obj.push(val)
+# obj.pop()
+# param_3 = obj.top()
+# param_4 = obj.getMin()
+
+Logger Rate Limiter
+class Logger:
+
+    def __init__(self):
+        self.message_to_time = {}
+        
+
+    def shouldPrintMessage(self, timestamp: int, message: str) -> bool:
+        if message in self.message_to_time:
+            oldTime = self.message_to_time[message]
+            if timestamp - oldTime >= 10:
+                self.message_to_time[message] = timestamp
+                return True
+        else:
+            self.message_to_time[message] = timestamp
+            return True
+        return False
+            
+
+
+# Your Logger object will be instantiated and called as such:
+# obj = Logger()
+# param_1 = obj.shouldPrintMessage(timestamp,message)
+
+
